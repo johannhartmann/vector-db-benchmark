@@ -34,6 +34,8 @@ docker compose up
 
 Containers are expected to expose all necessary ports, so the client can connect to them.
 
+Some engines have dedicated setup notes, e.g. [pgturbohybrid](./docs/pgturbohybrid.md) (dense-vector mode).
+
 ### Run the client
 
 Install dependencies:

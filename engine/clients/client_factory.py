@@ -18,6 +18,11 @@ from engine.clients.opensearch import (
     OpenSearchSearcher,
     OpenSearchUploader,
 )
+from engine.clients.pgturbohybrid import (
+    PgturboHybridConfigurator,
+    PgturboHybridSearcher,
+    PgturboHybridUploader,
+)
 from engine.clients.pgvector import (
     PgVectorConfigurator,
     PgVectorSearcher,
@@ -51,6 +56,7 @@ ENGINE_CONFIGURATORS = {
     "opensearch": OpenSearchConfigurator,
     "redis": RedisConfigurator,
     "pgvector": PgVectorConfigurator,
+    "pgturbohybrid": PgturboHybridConfigurator,
 }
 
 ENGINE_UPLOADERS = {
@@ -63,6 +69,7 @@ ENGINE_UPLOADERS = {
     "opensearch": OpenSearchUploader,
     "redis": RedisUploader,
     "pgvector": PgVectorUploader,
+    "pgturbohybrid": PgturboHybridUploader,
 }
 
 ENGINE_SEARCHERS = {
@@ -75,6 +82,7 @@ ENGINE_SEARCHERS = {
     "opensearch": OpenSearchSearcher,
     "redis": RedisSearcher,
     "pgvector": PgVectorSearcher,
+    "pgturbohybrid": PgturboHybridSearcher,
 }
 
 

@@ -1,0 +1,59 @@
+[
+    {
+        "name": "pgturbohybrid-dense-default",
+        "engine": "pgturbohybrid",
+        "connection_params": {},
+        "collection_params": { "ts_config": "english" },
+        "search_params": [
+            { "parallel": 1, "profile": "latency", "config": { "dense_k": 100, "final_k": 10 } },
+            { "parallel": 8, "profile": "latency", "config": { "dense_k": 100, "final_k": 10 } }
+        ],
+        "upload_params": {
+            "parallel": 1,
+            "batch_size": 1024,
+            "index": { "quantization_bits": 4, "exact_storage": false }
+        }
+    },
+    {
+        "name": "pgturbohybrid-dense-quality",
+        "engine": "pgturbohybrid",
+        "connection_params": {},
+        "collection_params": { "ts_config": "english" },
+        "search_params": [
+            { "parallel": 1, "profile": "quality", "config": { "dense_k": 200, "final_k": 10 } },
+            { "parallel": 8, "profile": "quality", "config": { "dense_k": 200, "final_k": 10 } }
+        ],
+        "upload_params": {
+            "parallel": 1,
+            "batch_size": 1024,
+            "index": { "quantization_bits": 4, "exact_storage": true }
+        }
+    },
+    {
+        "name": "pgturbohybrid-hybrid-kw-small-vocab",
+        "engine": "pgturbohybrid",
+        "connection_params": {},
+        "collection_params": { "ts_config": "english" },
+        "search_params": [
+            {
+                "parallel": 1,
+                "mode": "hybrid",
+                "ts_config": "english",
+                "query_text_key": "a",
+                "config": {
+                    "dense_k": 100,
+                    "bm25_k": 100,
+                    "rrf_k": 60,
+                    "final_k": 10,
+                    "require_bm25_match": false
+                }
+            }
+        ],
+        "upload_params": {
+            "parallel": 1,
+            "batch_size": 1024,
+            "text_field": "a",
+            "index": { "quantization_bits": 4, "exact_storage": false }
+        }
+    }
+]
