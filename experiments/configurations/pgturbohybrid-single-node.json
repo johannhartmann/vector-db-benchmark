@@ -104,6 +104,7 @@
             "index": {
                 "quantization_bits": 4,
                 "exact_storage": false,
+                "build_workers": 8,
                 "graph_ef_construction": 256,
                 "graph_ef_search": 192,
                 "graph_oversampling": 12,
