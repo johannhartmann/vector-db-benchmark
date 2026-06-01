@@ -100,5 +100,69 @@
                 }
             }
         }
+    },
+    {
+        "name": "pgturbohybrid-mr-hi",
+        "engine": "pgturbohybrid",
+        "connection_params": {},
+        "collection_params": { "ts_config": "english" },
+        "search_params": [
+            { "parallel": 1, "profile": "matched_recall", "runtime_settings": { "turbohybrid.dense_heap_rescore": "off", "turbohybrid.dense_adaptive_widening": "off" }, "config": { "dense_k": 100, "final_k": 10 } },
+            { "parallel": 8, "profile": "matched_recall", "runtime_settings": { "turbohybrid.dense_heap_rescore": "off", "turbohybrid.dense_adaptive_widening": "off" }, "config": { "dense_k": 100, "final_k": 10 } },
+            { "parallel": 1, "profile": "matched_recall", "runtime_settings": { "turbohybrid.dense_heap_rescore": "band", "turbohybrid.dense_adaptive_widening": "off" }, "config": { "dense_k": 100, "final_k": 10 } },
+            { "parallel": 8, "profile": "matched_recall", "runtime_settings": { "turbohybrid.dense_heap_rescore": "band", "turbohybrid.dense_adaptive_widening": "off" }, "config": { "dense_k": 100, "final_k": 10 } }
+        ],
+        "upload_params": {
+            "parallel": 1,
+            "batch_size": 1024,
+            "index": {
+                "quantization_bits": 4,
+                "exact_storage": false,
+                "graph_ef_construction": 256,
+                "graph_ef_search": 192,
+                "graph_oversampling": 12,
+                "native_segments": 1,
+                "build_settings": {
+                    "turbohybrid.profile": "matched_recall",
+                    "turbohybrid.dense_build_neighbor_select": "heuristic",
+                    "turbohybrid.dense_build_distance": "code",
+                    "turbohybrid.dense_heap_rescore": "off",
+                    "turbohybrid.dense_adaptive_widening": "off"
+                }
+            }
+        }
+    },
+    {
+        "name": "pgturbohybrid-mr-resrr",
+        "engine": "pgturbohybrid",
+        "connection_params": {},
+        "collection_params": { "ts_config": "english" },
+        "search_params": [
+            { "parallel": 1, "profile": "matched_recall", "runtime_settings": { "turbohybrid.dense_heap_rescore": "off", "turbohybrid.dense_adaptive_widening": "off" }, "config": { "dense_k": 100, "final_k": 10 } },
+            { "parallel": 8, "profile": "matched_recall", "runtime_settings": { "turbohybrid.dense_heap_rescore": "off", "turbohybrid.dense_adaptive_widening": "off" }, "config": { "dense_k": 100, "final_k": 10 } },
+            { "parallel": 1, "profile": "matched_recall", "runtime_settings": { "turbohybrid.dense_heap_rescore": "band", "turbohybrid.dense_adaptive_widening": "off" }, "config": { "dense_k": 100, "final_k": 10 } },
+            { "parallel": 8, "profile": "matched_recall", "runtime_settings": { "turbohybrid.dense_heap_rescore": "band", "turbohybrid.dense_adaptive_widening": "off" }, "config": { "dense_k": 100, "final_k": 10 } }
+        ],
+        "upload_params": {
+            "parallel": 1,
+            "batch_size": 1024,
+            "index": {
+                "quantization_bits": 4,
+                "exact_storage": false,
+                "residual_rerank": true,
+                "residual_rerank_bytes": 64,
+                "graph_ef_construction": 256,
+                "graph_ef_search": 192,
+                "graph_oversampling": 12,
+                "native_segments": 1,
+                "build_settings": {
+                    "turbohybrid.profile": "matched_recall",
+                    "turbohybrid.dense_build_neighbor_select": "heuristic",
+                    "turbohybrid.dense_build_distance": "code",
+                    "turbohybrid.dense_heap_rescore": "off",
+                    "turbohybrid.dense_adaptive_widening": "off"
+                }
+            }
+        }
     }
 ]

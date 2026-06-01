@@ -23,7 +23,12 @@ GRAPH_INT_OPTIONS = (
     "graph_ef_search",
     "graph_oversampling",
     "native_segments",
+    "residual_rerank_bytes",
 )
+
+# Boolean index storage options forwarded into the WITH clause as on/off when
+# present. Same trusted-whitelist rationale as GRAPH_INT_OPTIONS.
+GRAPH_BOOL_OPTIONS = ("residual_rerank",)
 
 
 class PgturboHybridUploader(BaseUploader):
@@ -123,6 +128,9 @@ class PgturboHybridUploader(BaseUploader):
         for opt in GRAPH_INT_OPTIONS:
             if opt in index_params:
                 with_opts.append(f"{opt} = {int(index_params[opt])}")
+        for opt in GRAPH_BOOL_OPTIONS:
+            if opt in index_params:
+                with_opts.append(f"{opt} = {'on' if index_params[opt] else 'off'}")
 
         cls.conn.execute(
             f"""CREATE INDEX {INDEX_NAME} ON {TABLE_NAME}
