@@ -61,6 +61,15 @@ class BaseSearcher:
         parallel = self.search_params.get("parallel", 1)
         top = self.search_params.get("top", None)
 
+        # Materialize (and thereby parse) all queries up front, OUTSIDE the
+        # timed region. Reading/decoding a query from the dataset costs ~0.5ms
+        # here (JSON parse + ndarray build); leaving it inside the loop made the
+        # single parent process the throughput bottleneck for fast engines — it
+        # could only feed/parse queries at ~1-2k/s no matter how quickly the
+        # engine answered. Search RPS should measure the engine, not the dataset
+        # reader.
+        queries = list(queries)
+
         # setup_search may require initialized client
         self.init_client(
             self.host, distance, self.connection_params, self.search_params
@@ -77,6 +86,15 @@ class BaseSearcher:
         else:
             ctx = get_context(self.get_mp_start_method())
 
+            # Hand each worker a batch of queries per IPC round-trip instead of
+            # one at a time (imap's default chunksize=1). With single-query
+            # chunks the parent does one pipe send + one result recv per query,
+            # and that per-task orchestration — not the engine — capped
+            # throughput at ~1k/s for sub-millisecond engines. Chunking keeps
+            # the parent off the critical path while still load-balancing across
+            # workers (each worker pulls many small chunks over the run).
+            chunksize = max(1, len(queries) // (parallel * 16))
+
             with ctx.Pool(
                 processes=parallel,
                 initializer=self.__class__.init_client,
@@ -91,7 +109,13 @@ class BaseSearcher:
                     time.sleep(15)  # Wait for all processes to start
                 start = time.perf_counter()
                 precisions, latencies = list(
-                    zip(*pool.imap_unordered(search_one, iterable=tqdm.tqdm(queries)))
+                    zip(
+                        *pool.imap_unordered(
+                            search_one,
+                            iterable=tqdm.tqdm(queries),
+                            chunksize=chunksize,
+                        )
+                    )
                 )
 
         total_time = time.perf_counter() - start
