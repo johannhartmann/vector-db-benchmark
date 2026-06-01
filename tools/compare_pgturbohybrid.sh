@@ -62,9 +62,13 @@ export PG_SHM_SIZE="${PG_SHM_SIZE:-4g}"
 # value, so use one pattern rather than space-separated names).
 PGVECTOR_ENGINES="pgvector-default"
 QDRANT_ENGINES="qdrant-default"
-# Dense comparison only. (The quality/exact-storage config is much slower to
-# build; opt in with PGTURBOHYBRID_ENGINES="pgturbohybrid-dense-*".)
-PGTURBOHYBRID_ENGINES="${PGTURBOHYBRID_ENGINES:-pgturbohybrid-dense-default}"
+# Default to the recommended exact-free, high-recall operating point: the
+# `high_recall` profile (heap-band exact rescore + heuristic graph topology, no
+# exact_storage). On dbpedia-openai-100K-1536-angular it reaches ~0.99 recall
+# while staying faster than pgvector/qdrant. Override for other points, e.g.
+# PGTURBOHYBRID_ENGINES="pgturbohybrid-dense-default" (max throughput, ~0.86
+# recall) or "pgturbohybrid-*" for the full set.
+PGTURBOHYBRID_ENGINES="${PGTURBOHYBRID_ENGINES:-pgturbohybrid-high-recall}"
 
 FAILED=()
 

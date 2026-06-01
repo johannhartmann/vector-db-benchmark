@@ -47,9 +47,31 @@ A larger run:
 poetry run python run.py --engines "pgturbohybrid-dense-default" --datasets "dbpedia-openai-100K-1536-angular" --timeout 7200
 ```
 
-`pgturbohybrid-dense-quality` is also available (exact storage on, `quality`
-profile, larger candidate budget). Use `--engines "pgturbohybrid-*"` to run all
-configurations.
+**Recommended default: `pgturbohybrid-high-recall`.** This is the exact-free,
+high-recall operating point. It selects the extension's `high_recall` profile,
+which bakes in `dense_heap_rescore=band` (exact rescore of the final candidate
+band from the heap), `dense_adaptive_widening=off`, and a heuristic graph
+topology (`graph_ef_construction=256`, `graph_ef_search=192`,
+`graph_oversampling=12`) — all with `exact_storage=off`. The config additionally
+pins those graph reloptions and `native_segments=1`, and builds with
+`dense_build_neighbor_select=heuristic` / `dense_build_distance=code`. It also
+pins `dense_heap_rescore=band` / `dense_adaptive_widening=off` explicitly in
+`search_params.runtime_settings`: the harness sets session GUCs on each worker
+connection *before* the extension library is loaded, so the profile's cascading
+defaults (which need the library loaded to fire) are pinned explicitly rather
+than relied upon. Interactive `SET turbohybrid.profile = 'high_recall'` does not
+need this. On `dbpedia-openai-100K-1536-angular` it reaches ~0.99 recall while
+staying faster than pgvector and qdrant:
+
+```bash
+poetry run python run.py --engines "pgturbohybrid-high-recall" --datasets "dbpedia-openai-100K-1536-angular" --timeout 7200
+```
+
+`pgturbohybrid-dense-default` (latency profile, ~0.86 recall) is the
+max-throughput point. `pgturbohybrid-dense-quality` is also available (exact
+storage on, `quality` profile) but `exact_storage=on` is generally not the
+goal — prefer `matched-recall-band`. Use `--engines "pgturbohybrid-*"` to run
+all configurations.
 
 ## Configuration
 
@@ -65,9 +87,23 @@ engine-specific fields are documented here:
 - `upload_params.index.exact_storage` — keep exact vectors alongside the
   quantized index (`true`/`false`). `false` is faster and smaller; `true`
   trades size for quality.
-- `search_params.profile` — session profile, `latency` or `quality`.
+- `search_params.profile` — session profile: `latency`, `balanced`,
+  `matched_recall`, `high_recall`, or `quality`. `high_recall` is the
+  exact-free near-exact-recall point (heap-band rescore; see the recommended
+  config above).
 - `search_params.config.dense_k` — dense candidate budget per query.
 - `search_params.config.final_k` — final result count requested from the index.
+- `search_params.runtime_settings` — arbitrary `turbohybrid.*` GUCs set per
+  search session (bound via `set_config`), e.g.
+  `{"turbohybrid.dense_heap_rescore": "band"}` to enable exact heap rescore of
+  the candidate band, or `"off"` to disable it.
+- `upload_params.index` graph/build options forwarded into the index `WITH`
+  clause: `graph_ef_construction`, `graph_ef_search`, `graph_oversampling`,
+  `native_segments` (ints), and `residual_rerank` (bool) /
+  `residual_rerank_bytes` (int).
+- `upload_params.index.build_settings` — `turbohybrid.*` GUCs set on the build
+  connection before `CREATE INDEX` (e.g. `turbohybrid.profile`,
+  `dense_build_neighbor_select`, `dense_build_distance`).
 
 Hybrid-only fields are described under [Hybrid mode](#hybrid-mode).
 
