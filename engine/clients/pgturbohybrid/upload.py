@@ -14,6 +14,17 @@ from engine.clients.pgturbohybrid.configure import TABLE_NAME
 
 INDEX_NAME = "items_turbohybrid_idx"
 
+# Extra integer index storage options forwarded verbatim into the index WITH
+# clause when present in upload_params.index. Names are a fixed, trusted
+# whitelist and values are coerced to int, so neither is attacker-controlled
+# SQL.
+GRAPH_INT_OPTIONS = (
+    "graph_ef_construction",
+    "graph_ef_search",
+    "graph_oversampling",
+    "native_segments",
+)
+
 
 class PgturboHybridUploader(BaseUploader):
     # Trusted mapping from the benchmark distance enum to the pgturbohybrid
@@ -73,6 +84,16 @@ class PgturboHybridUploader(BaseUploader):
         quantization_bits = int(index_params.get("quantization_bits", 4))
         exact_storage = "on" if index_params.get("exact_storage", False) else "off"
 
+        # Session GUCs that influence the build (e.g. turbohybrid.profile,
+        # dense_build_neighbor_select, dense_build_distance, dense_heap_rescore,
+        # dense_adaptive_widening). Both name and value are bound via set_config
+        # — nothing is interpolated — and they are set on the build connection
+        # so the following CREATE INDEX picks them up.
+        for key, value in index_params.get("build_settings", {}).items():
+            cls.conn.execute(
+                "SELECT set_config(%s, %s, false)", (str(key), str(value))
+            )
+
         # Optionally enable the native parallel build (scan/encode parallel;
         # edge construction stays serial). "auto" defers to PostgreSQL's worker
         # choice (no-op while the AM keeps amcanbuildparallel off); an explicit
@@ -92,16 +113,24 @@ class PgturboHybridUploader(BaseUploader):
                 (str(build_workers),),
             )
 
-        # opclass / exact_storage / quantization_bits are all derived from
-        # trusted internal mappings or coerced to int / on|off, so they are safe
-        # to interpolate into the DDL.
+        # opclass / exact_storage / quantization_bits and the graph options are
+        # all derived from trusted internal mappings or coerced to int / on|off,
+        # so they are safe to interpolate into the DDL.
+        with_opts = [
+            f"quantization_bits = {quantization_bits}",
+            f"exact_storage = {exact_storage}",
+        ]
+        for opt in GRAPH_INT_OPTIONS:
+            if opt in index_params:
+                with_opts.append(f"{opt} = {int(index_params[opt])}")
+
         cls.conn.execute(
             f"""CREATE INDEX {INDEX_NAME} ON {TABLE_NAME}
             USING turbohybrid (
                 embedding {opclass},
                 text_tsv bm25_tsvector_turbohybrid_ops
             )
-            WITH (quantization_bits = {quantization_bits}, exact_storage = {exact_storage})"""
+            WITH ({", ".join(with_opts)})"""
         )
         cls.conn.execute(f"ANALYZE {TABLE_NAME}")
 
