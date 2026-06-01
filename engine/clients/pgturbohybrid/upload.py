@@ -73,6 +73,25 @@ class PgturboHybridUploader(BaseUploader):
         quantization_bits = int(index_params.get("quantization_bits", 4))
         exact_storage = "on" if index_params.get("exact_storage", False) else "off"
 
+        # Optionally enable the native parallel build (scan/encode parallel;
+        # edge construction stays serial). "auto" defers to PostgreSQL's worker
+        # choice (no-op while the AM keeps amcanbuildparallel off); an explicit
+        # worker count forces it. Values are validated, then bound via
+        # set_config (SET cannot bind parameters).
+        build_workers = index_params.get("build_workers")
+        if build_workers is not None:
+            if str(build_workers) not in {"auto", "0", "1", "2", "4", "8"}:
+                raise IncompatibilityError(
+                    f"Invalid build_workers={build_workers!r}; use auto/0/1/2/4/8"
+                )
+            cls.conn.execute(
+                "SELECT set_config('max_parallel_maintenance_workers', '8', false)"
+            )
+            cls.conn.execute(
+                "SELECT set_config('turbohybrid.native_build_workers', %s, false)",
+                (str(build_workers),),
+            )
+
         # opclass / exact_storage / quantization_bits are all derived from
         # trusted internal mappings or coerced to int / on|off, so they are safe
         # to interpolate into the DDL.
