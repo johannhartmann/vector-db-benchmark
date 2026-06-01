@@ -19,6 +19,7 @@ INDEX_NAME = "items_turbohybrid_idx"
 # whitelist and values are coerced to int, so neither is attacker-controlled
 # SQL.
 GRAPH_INT_OPTIONS = (
+    "graph_m",
     "graph_ef_construction",
     "graph_ef_search",
     "graph_oversampling",

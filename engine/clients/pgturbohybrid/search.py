@@ -66,13 +66,11 @@ class PgturboHybridSearcher(BaseSearcher):
         # ts_config is the only other interpolated value (DDL/SQL functions
         # cannot take a regconfig as a bound parameter). All per-query values
         # (vector, candidate budgets, text) are bound.
+        # The benchmark only consumes ids (for recall), so SELECT only id and
+        # let the turbohybrid operator be evaluated once, in ORDER BY. (Selecting
+        # the score too would re-evaluate the operator per row for no benefit.)
         cls.dense_query = f"""
-            SELECT id,
-                   embedding {operator} turbohybrid_query(
-                       vector_query => %s::vector,
-                       dense_k => %s,
-                       final_k => %s
-                   ) AS _score
+            SELECT id
             FROM {TABLE_NAME}
             ORDER BY embedding {operator} turbohybrid_query(
                        vector_query => %s::vector,
@@ -83,16 +81,7 @@ class PgturboHybridSearcher(BaseSearcher):
         """
 
         cls.hybrid_query = f"""
-            SELECT id,
-                   embedding {operator} turbohybrid_query(
-                       vector_query => %s::vector,
-                       text_query => plainto_tsquery('{cls.ts_config}', %s),
-                       dense_k => %s,
-                       bm25_k => %s,
-                       rrf_k => %s,
-                       final_k => %s,
-                       require_bm25_match => %s
-                   ) AS _score
+            SELECT id
             FROM {TABLE_NAME}
             ORDER BY embedding {operator} turbohybrid_query(
                        vector_query => %s::vector,
@@ -136,12 +125,12 @@ class PgturboHybridSearcher(BaseSearcher):
                 require_bm25_match,
             )
             cls.cur.execute(
-                cls.hybrid_query, args + args + (top,), binary=True, prepare=True
+                cls.hybrid_query, args + (top,), binary=True, prepare=True
             )
         else:
             args = (vector, dense_k, final_k)
             cls.cur.execute(
-                cls.dense_query, args + args + (top,), binary=True, prepare=True
+                cls.dense_query, args + (top,), binary=True, prepare=True
             )
 
         return cls.cur.fetchall()
