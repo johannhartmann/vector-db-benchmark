@@ -11,3 +11,5 @@ ansible/playbooks/inventory.ini
 
 .python-version
 .venv/
+# local Claude Code agent state
+.claude/

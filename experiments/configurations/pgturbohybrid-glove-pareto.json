@@ -1,0 +1,413 @@
+[
+  {
+    "name": "pgturbo-pareto-def",
+    "engine": "pgturbohybrid",
+    "connection_params": {},
+    "collection_params": {
+      "ts_config": "english"
+    },
+    "search_params": [
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "off",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 50,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "off",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 100,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "off",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 200,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "topk",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 50,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "topk",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 100,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "topk",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 200,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "band",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 50,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "band",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 100,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "band",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 200,
+          "final_k": 10
+        }
+      }
+    ],
+    "upload_params": {
+      "parallel": 1,
+      "batch_size": 1024,
+      "index": {
+        "quantization_bits": 4,
+        "exact_storage": false,
+        "build_workers": 8,
+        "native_segments": 1,
+        "build_settings": {
+          "turbohybrid.profile": "high_recall",
+          "turbohybrid.dense_build_neighbor_select": "heuristic",
+          "turbohybrid.dense_build_distance": "code"
+        },
+        "graph_m": 16,
+        "graph_ef_construction": 128,
+        "graph_ef_search": 64,
+        "graph_oversampling": 4
+      }
+    }
+  },
+  {
+    "name": "pgturbo-pareto-hr",
+    "engine": "pgturbohybrid",
+    "connection_params": {},
+    "collection_params": {
+      "ts_config": "english"
+    },
+    "search_params": [
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "off",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 50,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "off",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 100,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "off",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 200,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "topk",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 50,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "topk",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 100,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "topk",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 200,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "band",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 50,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "band",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 100,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "band",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 200,
+          "final_k": 10
+        }
+      }
+    ],
+    "upload_params": {
+      "parallel": 1,
+      "batch_size": 1024,
+      "index": {
+        "quantization_bits": 4,
+        "exact_storage": false,
+        "build_workers": 8,
+        "native_segments": 1,
+        "build_settings": {
+          "turbohybrid.profile": "high_recall",
+          "turbohybrid.dense_build_neighbor_select": "heuristic",
+          "turbohybrid.dense_build_distance": "code"
+        },
+        "graph_m": 16,
+        "graph_ef_construction": 256,
+        "graph_ef_search": 192,
+        "graph_oversampling": 12
+      }
+    }
+  },
+  {
+    "name": "pgturbo-pareto-heavy",
+    "engine": "pgturbohybrid",
+    "connection_params": {},
+    "collection_params": {
+      "ts_config": "english"
+    },
+    "search_params": [
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "off",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 50,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "off",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 100,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "off",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 200,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "topk",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 50,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "topk",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 100,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "topk",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 200,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "band",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 50,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "band",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 100,
+          "final_k": 10
+        }
+      },
+      {
+        "parallel": 8,
+        "profile": "high_recall",
+        "runtime_settings": {
+          "turbohybrid.dense_heap_rescore": "band",
+          "turbohybrid.dense_adaptive_widening": "off"
+        },
+        "config": {
+          "dense_k": 200,
+          "final_k": 10
+        }
+      }
+    ],
+    "upload_params": {
+      "parallel": 1,
+      "batch_size": 1024,
+      "index": {
+        "quantization_bits": 4,
+        "exact_storage": false,
+        "build_workers": 8,
+        "native_segments": 1,
+        "build_settings": {
+          "turbohybrid.profile": "high_recall",
+          "turbohybrid.dense_build_neighbor_select": "heuristic",
+          "turbohybrid.dense_build_distance": "code"
+        },
+        "graph_m": 32,
+        "graph_ef_construction": 256,
+        "graph_ef_search": 256,
+        "graph_oversampling": 16
+      }
+    }
+  }
+]
