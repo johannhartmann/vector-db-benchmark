@@ -60,6 +60,16 @@ class BaseSearcher:
     ):
         parallel = self.search_params.get("parallel", 1)
         top = self.search_params.get("top", None)
+        # Run an untimed warm-up pass before timing so every engine is measured
+        # at steady state. Engines differ in where their working set lives:
+        # pgvector/qdrant/etc keep the index in shared buffers (already warm from
+        # the build that precedes search), while engines with a separate scan
+        # cache (e.g. pgturbohybrid's native mmap cache) start cold after build
+        # and would otherwise pay one-time cache population INSIDE the timed
+        # window. A warm-up pass through the same persistent workers makes the
+        # comparison fair (engine vs engine, not warm-cache vs cold-cache). On by
+        # default; set search_params.warmup=false to measure cold-start instead.
+        warmup = self.search_params.get("warmup", True)
 
         # Materialize (and thereby parse) all queries up front, OUTSIDE the
         # timed region. Reading/decoding a query from the dataset costs ~0.5ms
@@ -79,6 +89,9 @@ class BaseSearcher:
         search_one = functools.partial(self.__class__._search_one, top=top)
 
         if parallel == 1:
+            if warmup:
+                for query in tqdm.tqdm(queries, desc="warmup"):
+                    search_one(query)
             start = time.perf_counter()
             precisions, latencies = list(
                 zip(*[search_one(query) for query in tqdm.tqdm(queries)])
@@ -107,6 +120,17 @@ class BaseSearcher:
             ) as pool:
                 if parallel > 10:
                     time.sleep(15)  # Wait for all processes to start
+                if warmup:
+                    # Untimed warm-up through the SAME persistent pool workers,
+                    # so each worker's connection and engine-side cache are hot
+                    # before the timed pass.
+                    list(
+                        pool.imap_unordered(
+                            search_one,
+                            iterable=tqdm.tqdm(queries, desc="warmup"),
+                            chunksize=chunksize,
+                        )
+                    )
                 start = time.perf_counter()
                 precisions, latencies = list(
                     zip(
